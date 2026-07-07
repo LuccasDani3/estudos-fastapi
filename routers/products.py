@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from schemas.product import ProductCreate
+
+from services.product_service import ProductService, get_product_service
 
 router = APIRouter(
     prefix="/products",
@@ -11,33 +13,22 @@ router = APIRouter(
 @router.get('/')
 def get_products(
         min_price: float | None = None,
-        max_price: float | None = None
+        max_price: float | None = None,
+        service: ProductService = Depends(get_product_service)
         ):
 
-    filtered = products
-
-    if min_price is not None:
-        filtered = [
-            p for p in filtered 
-            if p["price"] >= min_price
-        ]
-    if max_price is not None:
-        filtered = [
-            p for p in filtered
-            if p["price"] <= max_price
-        ]
-    
-    return filtered
+    return service.get_all(min_price, max_price)
 
 
-@router.get('/{id}')
-def get_product(id: int):
-    for product in products:
-        if product["id"] == id:
-            return product
+@router.get('/{product_id}')
+def get_product(
+    product_id: int,
+    service: ProductService = Depends(get_product_service)):
 
+    return service.get_by_id(product_id)
 
 @router.post('/')
-def create_product(product: ProductCreate):
-    products.append(product.model_dump())
-    return products
+def create_product(
+    product: ProductCreate,
+    service: ProductService = Depends(get_product_service)):
+    return service.create(product)

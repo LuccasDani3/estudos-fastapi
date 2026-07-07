@@ -1,3 +1,7 @@
+from fastapi import HTTPException
+
+from schemas.product import ProductCreate
+
 products = [
     {"name": "Mouse", "price": 25, "id": 1},
     {"name": "Teclado", "price": 150, "id": 2},
@@ -6,9 +10,40 @@ products = [
 ]
 
 class ProductService:
+    def get_all(
+        self, 
+        min_price: float | None,
+        max_price: float | None
+        ):
+        
+        filtered = products
+
+        if min_price is not None:
+            filtered = [
+                p for p in filtered 
+                if p["price"] >= min_price
+            ]
+
+        if max_price is not None:
+            filtered = [
+                p for p in filtered
+                if p["price"] <= max_price
+            ]
+        return filtered
     
-    def get_all():
-        return products
-    
+    def get_by_id(self, product_id: int):
+        for product in products:
+            if product["id"] == product_id:
+                return product
+            
+        raise HTTPException(
+            status_code=404,
+            detail="Esse item não existe"
+        )
+        
+    def create(self, product: ProductCreate):
+        products.append(product.model_dump())
+        return product
+
 def get_product_service():
-    return ProductService
+    return ProductService()
