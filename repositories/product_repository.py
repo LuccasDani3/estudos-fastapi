@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-
 from schemas.product import ProductCreate
 
 products = [
@@ -14,10 +12,12 @@ class ProductRepository:
         products.append(product.model_dump())
         return product
     
+
     def get_by_id(self, product_id: int):
         for product in products:
             if product["id"] == product_id:
                 return product
+
 
     def list(
         self, 
@@ -40,8 +40,14 @@ class ProductRepository:
             ]
         return filtered
 
-    def delete():
+
+    def update(self, product_id: int):
         pass
+
+
+    def delete(self, product_id: int):
+        pass
+
 
 def get_product_repository():
     return ProductRepository()

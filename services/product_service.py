@@ -1,32 +1,43 @@
-from fastapi import Depends, HTTPException
-
-from repositories.product_repository import ProductRepository, get_product_repository
+from repositories.product_repository import ProductRepository
 
 from schemas.product import ProductCreate
 
-class ProductService:  
+class ProductService:
+    def __init__(self, repository):
+        self.repository = repository
+
+
     def create(
         self,
         product: ProductCreate,
-        repository: ProductRepository = Depends(get_product_repository)
     ):
-        return repository.create(product)
+        return self.repository.create(product)
     
+
     def list(
         self,
-        min_length: float | None,
-        max_length: float | None,
-        repository: ProductRepository = Depends(get_product_repository)
+        min_price: float | None,
+        max_price: float | None,
     ):
-        return repository.list()
+        return self.repository.list(min_price, max_price)
     
-    def get(
+
+    def get_by_id(
         self,
         product_id: int,
-        repository: ProductRepository = Depends(get_product_repository)
     ):
-        return repository.get_by_id(product_id)
+        return self.repository.get_by_id(product_id)
+    
+
+    def update(self, product_id: int):
+        pass
+    
+
+    def delete(self, product_id: int):
+        pass
 
         
 def get_product_service():
-    return ProductService()
+    repository = ProductRepository()
+    service = ProductService(repository)
+    return service
