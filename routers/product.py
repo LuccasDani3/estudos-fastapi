@@ -9,15 +9,21 @@ router = APIRouter(
     tags=["Produtos"]
 )
 
+@router.post('/')
+def list_products(
+    product: ProductCreate,
+    service: ProductService = Depends(get_product_service)):
+    return service.create(product)
+
 
 @router.get('/')
-def get_products(
+def create_product(
         min_price: float | None = None,
         max_price: float | None = None,
         service: ProductService = Depends(get_product_service)
         ):
 
-    return service.get_all(min_price, max_price)
+    return service.list(min_price, max_price)
 
 
 @router.get('/{product_id}')
@@ -26,9 +32,3 @@ def get_product(
     service: ProductService = Depends(get_product_service)):
 
     return service.get_by_id(product_id)
-
-@router.post('/')
-def create_product(
-    product: ProductCreate,
-    service: ProductService = Depends(get_product_service)):
-    return service.create(product)
